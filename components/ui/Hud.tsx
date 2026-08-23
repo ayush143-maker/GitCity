@@ -17,7 +17,7 @@ export function Hud({
             GITHUB CYBER CITY
           </div>
           <div className="text-[11px] text-cyan-100/70 md:text-xs">
-            1000 DEVELOPER TOWERS — DEMO GRID
+            100 DEVELOPER TOWERS — GRID
           </div>
         </div>
       </div>
