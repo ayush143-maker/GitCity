@@ -1,0 +1,40 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+* {
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+}
+
+html,
+body {
+  max-width: 100vw;
+  overflow-x: hidden;
+  background: #05070a;
+  color: #e0f4ff;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
+canvas {
+  touch-action: none;
+}
+
+@layer utilities {
+  .text-cyber-cyan {
+    color: #00e5ff;
+  }
+  .text-cyber-blue {
+    color: #4aa3ff;
+  }
+  .bg-cyber-black {
+    background: #05070a;
+  }
+  .bg-cyber-dark {
+    background: #0a0e13;
+  }
+  .border-cyber-cyan {
+    border-color: #00e5ff;
+  }
+}
