@@ -4,7 +4,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { Canvas } from '@react-three/fiber';
 import * as THREE from 'three';
 
-import { CITY, generateDemoCity } from '@/lib/demoCity';
+import { generateDemoCity } from '@/lib/demoCity';
 import { DemoCity } from '@/components/city/DemoCity';
 import { CameraRig, type ControlState } from '@/components/controls/CameraRig';
 import { TouchControls } from '@/components/controls/TouchControls';
@@ -12,7 +12,7 @@ import { Hud } from '@/components/ui/Hud';
 import { Minimap } from '@/components/ui/Minimap';
 
 export default function CityScene() {
-  const data = useMemo(() => generateDemoCity(1000), []);
+  const data = useMemo(() => generateDemoCity(100), []);
 
   const controls = useRef<ControlState>({
     moveX: 0,
@@ -47,7 +47,7 @@ export default function CityScene() {
           fov: 58,
           near: 0.5,
           far: 1000,
-          position: [0, 92, 190],
+          position: [0, 72, 145],
         }}
         gl={{
           antialias: false,
@@ -60,7 +60,7 @@ export default function CityScene() {
         }}
       >
         <color attach="background" args={['#020409']} />
-        <fog attach="fog" args={['#020409', 95, 560]} />
+        <fog attach="fog" args={['#020409', 60, 360]} />
 
         <hemisphereLight args={['#2f5573', '#02040a', 0.9]} />
         <directionalLight
@@ -71,7 +71,7 @@ export default function CityScene() {
         <pointLight
           position={[0, 80, 0]}
           intensity={1.4}
-          distance={320}
+          distance={260}
           color="#00e5ff"
         />
 
@@ -87,9 +87,9 @@ export default function CityScene() {
         <div className="fixed inset-0 z-50 grid place-items-center bg-[#020409]/80 backdrop-blur-sm">
           <div className="space-y-3 text-center">
             <div className="font-display text-sm text-cyan-300 animate-pulse">
-              GENERATING 1000 TOWERS
+              GENERATING 100 TOWERS
             </div>
-            <div className="mx-auto h-1 w-56 overflow-hidden rounded bg-cyan-950">
+            <div className="mx-auto h-1 w-56 overflow-hidden rounded bg-[#062c3a]">
               <div className="h-full w-1/2 animate-pulse bg-cyan-400" />
             </div>
           </div>
