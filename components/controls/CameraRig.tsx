@@ -17,6 +17,8 @@ export type ControlState = {
   camZ: number;
 };
 
+const BOUND = CITY.size / 2;
+
 export function CameraRig({
   controls,
 }: {
@@ -134,18 +136,9 @@ export function CameraRig({
 
     camera.position.addScaledVector(vel.current, dt);
 
-    camera.position.x = THREE.MathUtils.clamp(
-      camera.position.x,
-      -CITY.radius - 50,
-      CITY.radius + 50
-    );
-
-    camera.position.z = THREE.MathUtils.clamp(
-      camera.position.z,
-      -CITY.radius - 50,
-      CITY.radius + 50
-    );
-
+    // Invisible rectangular boundary
+    camera.position.x = THREE.MathUtils.clamp(camera.position.x, -BOUND, BOUND);
+    camera.position.z = THREE.MathUtils.clamp(camera.position.z, -BOUND, BOUND);
     camera.position.y = THREE.MathUtils.clamp(camera.position.y, 2.5, 260);
 
     c.camX = camera.position.x;
