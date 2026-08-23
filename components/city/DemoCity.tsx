@@ -6,7 +6,59 @@ import { useFrame } from '@react-three/fiber';
 
 import { CITY, DemoBuilding } from '@/lib/demoCity';
 
+const BLOCK_PLOTS = 2;
+const BLOCK_SIZE = CITY.pitch * BLOCK_PLOTS;
+const CITY_HALF = CITY.size / 2;
+const BLOCK_INSET = 1.4;
+
+interface Block {
+  bx: number;
+  bz: number;
+}
+
+interface Dot {
+  x: number;
+  y: number;
+  z: number;
+  color: string;
+}
+
 export function DemoCity({ buildings }: { buildings: DemoBuilding[] }) {
+  const blocks = useMemo(() => {
+    const map = new Map<string, Block>();
+
+    buildings.forEach((b) => {
+      const bx = Math.floor((b.x + CITY_HALF) / BLOCK_SIZE);
+      const bz = Math.floor((b.z + CITY_HALF) / BLOCK_SIZE);
+      const key = `${bx}_${bz}`;
+
+      if (!map.has(key)) {
+        map.set(key, { bx, bz });
+      }
+    });
+
+    return Array.from(map.values());
+  }, [buildings]);
+
+  const dots = useMemo(() => {
+    const list: Dot[] = [];
+
+    buildings.forEach((b) => {
+      const count = Math.min(12, Math.max(2, Math.round(b.commits / 450)));
+
+      for (let i = 0; i < count; i++) {
+        list.push({
+          x: b.x + (Math.random() - 0.5) * b.w * 0.9,
+          y: 0.25 + Math.random() * 0.1,
+          z: b.z + (Math.random() - 0.5) * b.d * 0.9,
+          color: Math.random() > 0.5 ? '#00e5ff' : '#4aa3ff',
+        });
+      }
+    });
+
+    return list;
+  }, [buildings]);
+
   const groups = useMemo(() => {
     const low: DemoBuilding[] = [];
     const mid: DemoBuilding[] = [];
@@ -21,11 +73,13 @@ export function DemoCity({ buildings }: { buildings: DemoBuilding[] }) {
     return { low, mid, high };
   }, [buildings]);
 
-  const ground = useMemo(() => makeGroundTexture(), []);
-
   return (
     <group>
-      <Ground map={ground.map} emissiveMap={ground.emissiveMap} />
+      <Ground />
+
+      <BlockBorders blocks={blocks} />
+      <BlockFloors blocks={blocks} />
+      <CommitDots dots={dots} />
 
       {groups.low.length > 0 && (
         <InstancedBuildings
@@ -54,34 +108,188 @@ export function DemoCity({ buildings }: { buildings: DemoBuilding[] }) {
         />
       )}
 
-      {groups.high.length > 0 && <Beacons items={groups.high.slice(0, 120)} />}
-
       <Landmark />
       <Stars />
     </group>
   );
 }
 
-function Ground({
-  map,
-  emissiveMap,
-}: {
-  map: THREE.Texture;
-  emissiveMap: THREE.Texture;
-}) {
+function Ground() {
   return (
     <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.05, 0]}>
-      <planeGeometry args={[CITY.planeSize, CITY.planeSize]} />
-      <meshStandardMaterial
-        map={map}
-        emissiveMap={emissiveMap}
-        emissive="#ffffff"
-        emissiveIntensity={0.25}
-        color="#8fa5b8"
-        roughness={1}
-        metalness={0}
-      />
+      <planeGeometry args={[CITY.size + 60, CITY.size + 60]} />
+      <meshStandardMaterial color="#05070c" roughness={1} metalness={0} />
     </mesh>
+  );
+}
+
+function BlockBorders({ blocks }: { blocks: Block[] }) {
+  const ref = useRef<THREE.InstancedMesh>(null);
+
+  const geometry = useMemo(() => new THREE.BoxGeometry(1, 1, 1), []);
+
+  const material = useMemo(
+    () =>
+      new THREE.MeshBasicMaterial({
+        color: '#ffffff',
+        transparent: true,
+        opacity: 0.9,
+        toneMapped: false,
+      }),
+    []
+  );
+
+  useLayoutEffect(() => {
+    const mesh = ref.current;
+    if (!mesh) return;
+
+    const dummy = new THREE.Object3D();
+    const color = new THREE.Color();
+
+    const t = 0.3;
+    const y = 0.15;
+    const edgeLen = BLOCK_SIZE - BLOCK_INSET * 2;
+
+    let index = 0;
+
+    blocks.forEach((block) => {
+      const minX = block.bx * BLOCK_SIZE - CITY_HALF;
+      const minZ = block.bz * BLOCK_SIZE - CITY_HALF;
+      const maxX = minX + BLOCK_SIZE;
+      const maxZ = minZ + BLOCK_SIZE;
+
+      const cx = minX + BLOCK_SIZE / 2;
+      const cz = minZ + BLOCK_SIZE / 2;
+
+      const accent =
+        (block.bx + block.bz) % 2 === 0 ? '#00e5ff' : '#4aa3ff';
+
+      const edges = [
+        { pos: [cx, y, minZ + BLOCK_INSET], scale: [edgeLen, t, t] },
+        { pos: [cx, y, maxZ - BLOCK_INSET], scale: [edgeLen, t, t] },
+        { pos: [minX + BLOCK_INSET, y, cz], scale: [t, t, edgeLen] },
+        { pos: [maxX - BLOCK_INSET, y, cz], scale: [t, t, edgeLen] },
+      ];
+
+      edges.forEach((edge) => {
+        dummy.position.set(edge.pos[0], edge.pos[1], edge.pos[2]);
+        dummy.scale.set(edge.scale[0], edge.scale[1], edge.scale[2]);
+        dummy.updateMatrix();
+
+        mesh.setMatrixAt(index, dummy.matrix);
+        color.set(accent);
+        mesh.setColorAt(index, color);
+
+        index++;
+      });
+    });
+
+    mesh.instanceMatrix.needsUpdate = true;
+    if (mesh.instanceColor) mesh.instanceColor.needsUpdate = true;
+  }, [blocks]);
+
+  if (!blocks.length) return null;
+
+  return (
+    <instancedMesh
+      ref={ref}
+      args={[geometry, material, blocks.length * 4]}
+      frustumCulled={false}
+    />
+  );
+}
+
+function BlockFloors({ blocks }: { blocks: Block[] }) {
+  const ref = useRef<THREE.InstancedMesh>(null);
+
+  const geometry = useMemo(() => new THREE.BoxGeometry(1, 1, 1), []);
+
+  const material = useMemo(
+    () =>
+      new THREE.MeshBasicMaterial({
+        color: '#0a1018',
+        transparent: true,
+        opacity: 0.55,
+      }),
+    []
+  );
+
+  useLayoutEffect(() => {
+    const mesh = ref.current;
+    if (!mesh) return;
+
+    const dummy = new THREE.Object3D();
+
+    const floorSize = BLOCK_SIZE - BLOCK_INSET * 2;
+
+    blocks.forEach((block, i) => {
+      const cx = block.bx * BLOCK_SIZE - CITY_HALF + BLOCK_SIZE / 2;
+      const cz = block.bz * BLOCK_SIZE - CITY_HALF + BLOCK_SIZE / 2;
+
+      dummy.position.set(cx, 0.02, cz);
+      dummy.scale.set(floorSize, 0.04, floorSize);
+      dummy.updateMatrix();
+
+      mesh.setMatrixAt(i, dummy.matrix);
+    });
+
+    mesh.instanceMatrix.needsUpdate = true;
+  }, [blocks]);
+
+  if (!blocks.length) return null;
+
+  return (
+    <instancedMesh
+      ref={ref}
+      args={[geometry, material, blocks.length]}
+      frustumCulled={false}
+    />
+  );
+}
+
+function CommitDots({ dots }: { dots: Dot[] }) {
+  const ref = useRef<THREE.InstancedMesh>(null);
+
+  const geometry = useMemo(() => new THREE.SphereGeometry(0.16, 6, 6), []);
+
+  const material = useMemo(
+    () =>
+      new THREE.MeshBasicMaterial({
+        color: '#ffffff',
+        toneMapped: false,
+      }),
+    []
+  );
+
+  useLayoutEffect(() => {
+    const mesh = ref.current;
+    if (!mesh) return;
+
+    const dummy = new THREE.Object3D();
+    const color = new THREE.Color();
+
+    dots.forEach((dot, i) => {
+      dummy.position.set(dot.x, dot.y, dot.z);
+      dummy.scale.set(1, 1, 1);
+      dummy.updateMatrix();
+
+      mesh.setMatrixAt(i, dummy.matrix);
+      color.set(dot.color);
+      mesh.setColorAt(i, color);
+    });
+
+    mesh.instanceMatrix.needsUpdate = true;
+    if (mesh.instanceColor) mesh.instanceColor.needsUpdate = true;
+  }, [dots]);
+
+  if (!dots.length) return null;
+
+  return (
+    <instancedMesh
+      ref={ref}
+      args={[geometry, material, dots.length]}
+      frustumCulled={false}
+    />
   );
 }
 
@@ -133,7 +341,6 @@ function InstancedBuildings({
     if (!mesh) return;
 
     const mats = mesh.material;
-
     if (!Array.isArray(mats)) return;
 
     const side = mats[0] as THREE.MeshStandardMaterial;
@@ -141,10 +348,8 @@ function InstancedBuildings({
 
     const t = state.clock.elapsedTime;
 
-    // Dim to high intro glow
     const intro = Math.min(1, t / 3.2);
 
-    // Sparkle pulse
     const pulse =
       1.05 +
       Math.sin(t * 0.8 + sparkleOffset) * 0.35 +
@@ -181,71 +386,6 @@ function InstancedBuildings({
     <instancedMesh
       ref={ref}
       args={[geometry, materials as any, items.length]}
-      frustumCulled={false}
-    />
-  );
-}
-
-function Beacons({ items }: { items: DemoBuilding[] }) {
-  const ref = useRef<THREE.InstancedMesh>(null);
-
-  const geometry = useMemo(() => {
-    const g = new THREE.BoxGeometry(0.4, 1, 0.4);
-    g.translate(0, 0.5, 0);
-    return g;
-  }, []);
-
-  const material = useMemo(
-    () =>
-      new THREE.MeshBasicMaterial({
-        color: '#ffffff',
-        transparent: true,
-        opacity: 0.9,
-        toneMapped: false,
-      }),
-    []
-  );
-
-  useFrame((state) => {
-    const t = state.clock.elapsedTime;
-
-    const intro = Math.min(1, t / 2.8);
-
-    const pulse =
-      0.55 +
-      Math.sin(t * 2.4) * 0.35 +
-      Math.sin(t * 9.2) * 0.08;
-
-    material.opacity = Math.max(0.08, intro * pulse);
-  });
-
-  useLayoutEffect(() => {
-    const mesh = ref.current;
-    if (!mesh) return;
-
-    const dummy = new THREE.Object3D();
-    const color = new THREE.Color();
-
-    items.forEach((b, i) => {
-      dummy.position.set(b.x, b.h, b.z);
-      dummy.scale.set(1, 2 + (b.id % 5), 1);
-      dummy.updateMatrix();
-
-      mesh.setMatrixAt(i, dummy.matrix);
-      color.set(i % 3 === 0 ? '#4aa3ff' : '#00e5ff');
-      mesh.setColorAt(i, color);
-    });
-
-    mesh.instanceMatrix.needsUpdate = true;
-    if (mesh.instanceColor) mesh.instanceColor.needsUpdate = true;
-  }, [items]);
-
-  if (!items.length) return null;
-
-  return (
-    <instancedMesh
-      ref={ref}
-      args={[geometry, material, items.length]}
       frustumCulled={false}
     />
   );
@@ -340,109 +480,6 @@ function Stars() {
       />
     </points>
   );
-}
-
-function makeGroundTexture() {
-  const size = 1024;
-  const plane = CITY.planeSize;
-  const scale = size / plane;
-
-  const to = (v: number) => (v + plane / 2) * scale;
-
-  const base = document.createElement('canvas');
-  base.width = size;
-  base.height = size;
-
-  const glow = document.createElement('canvas');
-  glow.width = size;
-  glow.height = size;
-
-  const b = base.getContext('2d')!;
-  const g = glow.getContext('2d')!;
-
-  b.fillStyle = '#020408';
-  b.fillRect(0, 0, size, size);
-
-  g.fillStyle = '#000000';
-  g.fillRect(0, 0, size, size);
-
-  // Blocks
-  const inner = CITY.pitch - CITY.road - 2;
-
-  for (let gx = 0; gx < CITY.grid; gx++) {
-    for (let gz = 0; gz < CITY.grid; gz++) {
-      const x = (gx - CITY.grid / 2 + 0.5) * CITY.pitch;
-      const z = (gz - CITY.grid / 2 + 0.5) * CITY.pitch;
-
-      const px = to(x);
-      const py = to(z);
-      const s = inner * scale;
-
-      b.fillStyle = 'rgba(5, 9, 14, 0.92)';
-      b.fillRect(px - s / 2, py - s / 2, s, s);
-
-      b.strokeStyle = 'rgba(0, 229, 255, 0.05)';
-      b.strokeRect(px - s / 2, py - s / 2, s, s);
-    }
-  }
-
-  // Roads
-  const roadPx = CITY.road * scale;
-
-  b.fillStyle = '#070c12';
-
-  for (let k = -CITY.grid / 2; k <= CITY.grid / 2; k++) {
-    const p = to(k * CITY.pitch);
-
-    b.fillRect(p - roadPx / 2, 0, roadPx, size);
-    b.fillRect(0, p - roadPx / 2, size, roadPx);
-  }
-
-  // Central plaza
-  const cx = to(0);
-  const cy = to(0);
-  const plazaRadius = 22 * scale;
-
-  const grad = b.createRadialGradient(cx, cy, 4, cx, cy, plazaRadius);
-  grad.addColorStop(0, 'rgba(0, 229, 255, 0.22)');
-  grad.addColorStop(0.5, 'rgba(0, 120, 180, 0.08)');
-  grad.addColorStop(1, 'rgba(0, 0, 0, 0)');
-
-  b.fillStyle = grad;
-  b.beginPath();
-  b.arc(cx, cy, plazaRadius, 0, Math.PI * 2);
-  b.fill();
-
-  // Neon road lines
-  g.lineWidth = Math.max(1.2, 0.55 * scale);
-  g.strokeStyle = 'rgba(0, 229, 255, 0.9)';
-  g.shadowColor = 'rgba(0, 229, 255, 0.8)';
-  g.shadowBlur = 8;
-
-  for (let k = -CITY.grid / 2; k <= CITY.grid / 2; k++) {
-    const p = to(k * CITY.pitch);
-
-    g.beginPath();
-    g.moveTo(p, 0);
-    g.lineTo(p, size);
-    g.stroke();
-
-    g.beginPath();
-    g.moveTo(0, p);
-    g.lineTo(size, p);
-    g.stroke();
-  }
-
-  const map = new THREE.CanvasTexture(base);
-  const emissiveMap = new THREE.CanvasTexture(glow);
-
-  map.colorSpace = THREE.SRGBColorSpace;
-  emissiveMap.colorSpace = THREE.SRGBColorSpace;
-
-  map.anisotropy = 4;
-  emissiveMap.anisotropy = 2;
-
-  return { map, emissiveMap };
 }
 
 function createFacadeTextures(repeatX: number, repeatY: number) {
