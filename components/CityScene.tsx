@@ -9,7 +9,6 @@ import { DemoCity } from '@/components/city/DemoCity';
 import { CameraRig, type ControlState } from '@/components/controls/CameraRig';
 import { TouchControls } from '@/components/controls/TouchControls';
 import { Hud } from '@/components/ui/Hud';
-import { Minimap } from '@/components/ui/Minimap';
 
 export default function CityScene() {
   const data = useMemo(() => generateDemoCity(100), []);
@@ -81,7 +80,6 @@ export default function CityScene() {
 
       <TouchControls controls={controls} />
       <Hud data={data} showHint={showHint} />
-      <Minimap buildings={data.buildings} controls={controls} />
 
       {booting && (
         <div className="fixed inset-0 z-50 grid place-items-center bg-[#020409]/80 backdrop-blur-sm">
