@@ -1,4 +1,4 @@
-const GRID = 32;
+const GRID = 12;
 const PITCH = 18;
 const SIZE = GRID * PITCH;
 
@@ -116,7 +116,7 @@ function pick<T>(arr: T[], r: number): T {
   return arr[Math.floor(r * arr.length)];
 }
 
-export function generateDemoCity(count = 1000): DemoCityData {
+export function generateDemoCity(count = 100): DemoCityData {
   const rand = mulberry32(20260214);
 
   const cells: { x: number; z: number; dist: number }[] = [];
@@ -130,11 +130,10 @@ export function generateDemoCity(count = 1000): DemoCityData {
     }
   }
 
-  // Sort by distance from center, leave central plaza for landmark.
   cells.sort((a, b) => a.dist - b.dist);
 
-  // 1024 total cells - 24 central plaza cells = 1000 buildings.
-  const buildCells = cells.slice(24, 24 + count);
+  const centralSkip = CITY.grid <= 14 ? 16 : 24;
+  const buildCells = cells.slice(centralSkip, centralSkip + count);
 
   const buildings: DemoBuilding[] = buildCells.map((cell, i) => {
     const r1 = rand();
@@ -142,7 +141,7 @@ export function generateDemoCity(count = 1000): DemoCityData {
     const r3 = rand();
     const r4 = rand();
 
-    const centerFactor = Math.max(0, 1 - cell.dist / 260);
+    const centerFactor = Math.max(0, 1 - cell.dist / 140);
 
     let h =
       4 +
