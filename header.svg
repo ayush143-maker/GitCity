@@ -1,0 +1,226 @@
+<svg
+  xmlns="http://www.w3.org/2000/svg"
+  width="1200"
+  height="420"
+  viewBox="0 0 1200 420"
+  role="img"
+  aria-label="GitHub Cyber City"
+>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#01030a" />
+      <stop offset="55%" stop-color="#020409" />
+      <stop offset="100%" stop-color="#041019" />
+    </linearGradient>
+
+    <linearGradient id="tower" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#0c1824" />
+      <stop offset="100%" stop-color="#03050a" />
+    </linearGradient>
+
+    <linearGradient id="beam" x1="0" y1="1" x2="0" y2="0">
+      <stop offset="0%" stop-color="#00e5ff" stop-opacity="0.16" />
+      <stop offset="100%" stop-color="#00e5ff" stop-opacity="0" />
+    </linearGradient>
+
+    <pattern id="grid" width="42" height="42" patternUnits="userSpaceOnUse">
+      <path
+        d="M42 0H0V42"
+        fill="none"
+        stroke="#00e5ff"
+        stroke-opacity="0.07"
+      />
+    </pattern>
+
+    <pattern id="windowsA" width="14" height="20" patternUnits="userSpaceOnUse">
+      <rect x="3" y="5" width="5" height="9" rx="1" fill="#00e5ff" fill-opacity="0.30" />
+    </pattern>
+
+    <pattern id="windowsB" width="15" height="22" patternUnits="userSpaceOnUse">
+      <rect x="4" y="6" width="5" height="9" rx="1" fill="#4aa3ff" fill-opacity="0.26" />
+    </pattern>
+
+    <filter id="glow" x="-40%" y="-40%" width="180%" height="180%">
+      <feGaussianBlur stdDeviation="6" result="blur" />
+      <feMerge>
+        <feMergeNode in="blur" />
+        <feMergeNode in="SourceGraphic" />
+      </feMerge>
+    </filter>
+  </defs>
+
+  <rect width="1200" height="420" fill="url(#bg)" />
+  <rect width="1200" height="420" fill="url(#grid)" />
+
+  <rect x="520" y="0" width="160" height="420" fill="url(#beam)" />
+
+  <rect x="0" y="350" width="1200" height="70" fill="#020409" opacity="0.8" />
+  <line x1="0" y1="352" x2="1200" y2="352" stroke="#00e5ff" stroke-opacity="0.22" />
+
+  <!-- Left skyline -->
+  <g>
+    <rect x="45" y="248" width="42" height="104" fill="url(#tower)" stroke="#123043" stroke-opacity="0.55" />
+    <rect x="45" y="248" width="42" height="104" fill="url(#windowsA)" opacity="0.85" />
+    <rect x="45" y="246" width="42" height="2" fill="#00e5ff" opacity="0.6" />
+
+    <rect x="95" y="196" width="56" height="156" fill="url(#tower)" stroke="#123043" stroke-opacity="0.55" />
+    <rect x="95" y="196" width="56" height="156" fill="url(#windowsB)" opacity="0.9" />
+    <rect x="95" y="194" width="56" height="2" fill="#4aa3ff" opacity="0.55" />
+
+    <rect x="159" y="268" width="38" height="84" fill="url(#tower)" stroke="#123043" stroke-opacity="0.55" />
+    <rect x="159" y="268" width="38" height="84" fill="url(#windowsA)" opacity="0.8" />
+    <rect x="159" y="266" width="38" height="2" fill="#00e5ff" opacity="0.55" />
+
+    <rect x="205" y="162" width="62" height="190" fill="url(#tower)" stroke="#123043" stroke-opacity="0.55" />
+    <rect x="205" y="162" width="62" height="190" fill="url(#windowsB)" opacity="0.9" />
+    <rect x="205" y="160" width="62" height="2" fill="#4aa3ff" opacity="0.6" />
+
+    <rect x="275" y="236" width="46" height="116" fill="url(#tower)" stroke="#123043" stroke-opacity="0.55" />
+    <rect x="275" y="236" width="46" height="116" fill="url(#windowsA)" opacity="0.85" />
+    <rect x="275" y="234" width="46" height="2" fill="#00e5ff" opacity="0.6" />
+
+    <rect x="329" y="132" width="72" height="220" fill="url(#tower)" stroke="#123043" stroke-opacity="0.55" />
+    <rect x="329" y="132" width="72" height="220" fill="url(#windowsB)" opacity="0.95" />
+    <rect x="329" y="130" width="72" height="2" fill="#4aa3ff" opacity="0.7" />
+
+    <rect x="409" y="252" width="44" height="100" fill="url(#tower)" stroke="#123043" stroke-opacity="0.55" />
+    <rect x="409" y="252" width="44" height="100" fill="url(#windowsA)" opacity="0.8" />
+    <rect x="409" y="250" width="44" height="2" fill="#00e5ff" opacity="0.55" />
+
+    <rect x="461" y="188" width="58" height="164" fill="url(#tower)" stroke="#123043" stroke-opacity="0.55" />
+    <rect x="461" y="188" width="58" height="164" fill="url(#windowsB)" opacity="0.9" />
+    <rect x="461" y="186" width="58" height="2" fill="#4aa3ff" opacity="0.6" />
+  </g>
+
+  <!-- Central tower -->
+  <g>
+    <rect x="574" y="150" width="52" height="202" fill="url(#tower)" stroke="#1b4258" stroke-opacity="0.8" />
+    <rect x="574" y="150" width="52" height="202" fill="url(#windowsB)" opacity="0.98" />
+    <rect x="574" y="148" width="52" height="2" fill="#b9f7ff" opacity="0.85" />
+
+    <line x1="600" y1="150" x2="600" y2="118" stroke="#00e5ff" stroke-opacity="0.75" stroke-width="2" />
+
+    <circle cx="600" cy="114" r="5" fill="#eaffff">
+      <animate
+        attributeName="opacity"
+        values="0.35;1;0.35"
+        dur="2.4s"
+        repeatCount="indefinite"
+      />
+    </circle>
+
+    <circle cx="600" cy="114" r="10" fill="none" stroke="#00e5ff" stroke-width="1">
+      <animate
+        attributeName="r"
+        values="6;24"
+        dur="2.4s"
+        repeatCount="indefinite"
+      />
+      <animate
+        attributeName="stroke-opacity"
+        values="0.7;0"
+        dur="2.4s"
+        repeatCount="indefinite"
+      />
+    </circle>
+  </g>
+
+  <!-- Right skyline -->
+  <g>
+    <rect x="680" y="200" width="58" height="152" fill="url(#tower)" stroke="#123043" stroke-opacity="0.55" />
+    <rect x="680" y="200" width="58" height="152" fill="url(#windowsA)" opacity="0.88" />
+    <rect x="680" y="198" width="58" height="2" fill="#00e5ff" opacity="0.6" />
+
+    <rect x="746" y="150" width="68" height="202" fill="url(#tower)" stroke="#123043" stroke-opacity="0.55" />
+    <rect x="746" y="150" width="68" height="202" fill="url(#windowsB)" opacity="0.95" />
+    <rect x="746" y="148" width="68" height="2" fill="#4aa3ff" opacity="0.68" />
+
+    <rect x="822" y="240" width="46" height="112" fill="url(#tower)" stroke="#123043" stroke-opacity="0.55" />
+    <rect x="822" y="240" width="46" height="112" fill="url(#windowsA)" opacity="0.82" />
+    <rect x="822" y="238" width="46" height="2" fill="#00e5ff" opacity="0.55" />
+
+    <rect x="876" y="180" width="62" height="172" fill="url(#tower)" stroke="#123043" stroke-opacity="0.55" />
+    <rect x="876" y="180" width="62" height="172" fill="url(#windowsB)" opacity="0.9" />
+    <rect x="876" y="178" width="62" height="2" fill="#4aa3ff" opacity="0.6" />
+
+    <rect x="946" y="262" width="40" height="90" fill="url(#tower)" stroke="#123043" stroke-opacity="0.55" />
+    <rect x="946" y="262" width="40" height="90" fill="url(#windowsA)" opacity="0.8" />
+    <rect x="946" y="260" width="40" height="2" fill="#00e5ff" opacity="0.55" />
+
+    <rect x="994" y="140" width="72" height="212" fill="url(#tower)" stroke="#123043" stroke-opacity="0.55" />
+    <rect x="994" y="140" width="72" height="212" fill="url(#windowsB)" opacity="0.96" />
+    <rect x="994" y="138" width="72" height="2" fill="#4aa3ff" opacity="0.72" />
+
+    <rect x="1074" y="226" width="50" height="126" fill="url(#tower)" stroke="#123043" stroke-opacity="0.55" />
+    <rect x="1074" y="226" width="50" height="126" fill="url(#windowsA)" opacity="0.84" />
+    <rect x="1074" y="224" width="50" height="2" fill="#00e5ff" opacity="0.58" />
+
+    <rect x="1132" y="266" width="34" height="86" fill="url(#tower)" stroke="#123043" stroke-opacity="0.55" />
+    <rect x="1132" y="266" width="34" height="86" fill="url(#windowsB)" opacity="0.78" />
+    <rect x="1132" y="264" width="34" height="2" fill="#4aa3ff" opacity="0.5" />
+  </g>
+
+  <!-- Beacon dots -->
+  <circle cx="365" cy="128" r="2.5" fill="#00e5ff">
+    <animate attributeName="opacity" values="0.2;1;0.2" dur="1.9s" repeatCount="indefinite" />
+  </circle>
+
+  <circle cx="780" cy="146" r="2.5" fill="#4aa3ff">
+    <animate attributeName="opacity" values="0.2;1;0.2" dur="2.3s" repeatCount="indefinite" />
+  </circle>
+
+  <circle cx="1030" cy="136" r="2.5" fill="#00e5ff">
+    <animate attributeName="opacity" values="0.25;1;0.25" dur="2.7s" repeatCount="indefinite" />
+  </circle>
+
+  <!-- Title -->
+  <text
+    x="600"
+    y="88"
+    text-anchor="middle"
+    font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace"
+    font-size="52"
+    font-weight="700"
+    fill="#eaffff"
+    letter-spacing="12"
+    filter="url(#glow)"
+  >
+    GITHUB CYBER CITY
+  </text>
+
+  <text
+    x="600"
+    y="125"
+    text-anchor="middle"
+    font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace"
+    font-size="20"
+    font-weight="600"
+    fill="#00e5ff"
+    letter-spacing="7"
+  >
+    100 DEVELOPER TOWERS — GRID
+  </text>
+
+  <text
+    x="600"
+    y="396"
+    text-anchor="middle"
+    font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace"
+    font-size="14"
+    fill="#88ccdd"
+    letter-spacing="3"
+    opacity="0.75"
+  >
+    BLACK // CYAN // ELECTRIC BLUE // PROCEDURAL CITY
+  </text>
+
+  <!-- Subtle scanline -->
+  <rect x="0" y="0" width="1200" height="2" fill="#00e5ff" opacity="0.05">
+    <animate
+      attributeName="y"
+      values="0;418;0"
+      dur="10s"
+      repeatCount="indefinite"
+    />
+  </rect>
+</svg>
