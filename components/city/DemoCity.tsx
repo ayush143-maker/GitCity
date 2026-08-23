@@ -28,18 +28,33 @@ export function DemoCity({ buildings }: { buildings: DemoBuilding[] }) {
       <Ground map={ground.map} emissiveMap={ground.emissiveMap} />
 
       {groups.low.length > 0 && (
-        <InstancedBuildings items={groups.low} repeatX={3} repeatY={5} />
+        <InstancedBuildings
+          items={groups.low}
+          repeatX={3}
+          repeatY={5}
+          sparkleOffset={0}
+        />
       )}
 
       {groups.mid.length > 0 && (
-        <InstancedBuildings items={groups.mid} repeatX={4} repeatY={9} />
+        <InstancedBuildings
+          items={groups.mid}
+          repeatX={4}
+          repeatY={9}
+          sparkleOffset={1.7}
+        />
       )}
 
       {groups.high.length > 0 && (
-        <InstancedBuildings items={groups.high} repeatX={5} repeatY={16} />
+        <InstancedBuildings
+          items={groups.high}
+          repeatX={5}
+          repeatY={16}
+          sparkleOffset={3.4}
+        />
       )}
 
-      {groups.high.length > 0 && <Beacons items={groups.high.slice(0, 220)} />}
+      {groups.high.length > 0 && <Beacons items={groups.high.slice(0, 120)} />}
 
       <Landmark />
       <Stars />
@@ -74,10 +89,12 @@ function InstancedBuildings({
   items,
   repeatX,
   repeatY,
+  sparkleOffset = 0,
 }: {
   items: DemoBuilding[];
   repeatX: number;
   repeatY: number;
+  sparkleOffset?: number;
 }) {
   const ref = useRef<THREE.InstancedMesh>(null);
 
@@ -110,6 +127,31 @@ function InstancedBuildings({
 
     return [side, side, roof, roof, side, side];
   }, [repeatX, repeatY]);
+
+  useFrame((state) => {
+    const mesh = ref.current;
+    if (!mesh) return;
+
+    const mats = mesh.material;
+
+    if (!Array.isArray(mats)) return;
+
+    const side = mats[0] as THREE.MeshStandardMaterial;
+    if (!side) return;
+
+    const t = state.clock.elapsedTime;
+
+    // Dim to high intro glow
+    const intro = Math.min(1, t / 3.2);
+
+    // Sparkle pulse
+    const pulse =
+      1.05 +
+      Math.sin(t * 0.8 + sparkleOffset) * 0.35 +
+      Math.sin(t * 6.5 + sparkleOffset * 2.3) * 0.08;
+
+    side.emissiveIntensity = Math.max(0.05, intro * pulse);
+  });
 
   useLayoutEffect(() => {
     const mesh = ref.current;
@@ -157,10 +199,25 @@ function Beacons({ items }: { items: DemoBuilding[] }) {
     () =>
       new THREE.MeshBasicMaterial({
         color: '#ffffff',
+        transparent: true,
+        opacity: 0.9,
         toneMapped: false,
       }),
     []
   );
+
+  useFrame((state) => {
+    const t = state.clock.elapsedTime;
+
+    const intro = Math.min(1, t / 2.8);
+
+    const pulse =
+      0.55 +
+      Math.sin(t * 2.4) * 0.35 +
+      Math.sin(t * 9.2) * 0.08;
+
+    material.opacity = Math.max(0.08, intro * pulse);
+  });
 
   useLayoutEffect(() => {
     const mesh = ref.current;
@@ -196,10 +253,17 @@ function Beacons({ items }: { items: DemoBuilding[] }) {
 
 function Landmark() {
   const ring = useRef<THREE.Mesh>(null);
+  const sphereMat = useRef<THREE.MeshBasicMaterial>(null);
 
   useFrame((state) => {
+    const t = state.clock.elapsedTime;
+
     if (ring.current) {
-      ring.current.rotation.z = state.clock.elapsedTime * 0.18;
+      ring.current.rotation.z = t * 0.18;
+    }
+
+    if (sphereMat.current) {
+      sphereMat.current.opacity = 0.75 + Math.sin(t * 2.2) * 0.25;
     }
   });
 
@@ -221,7 +285,13 @@ function Landmark() {
 
       <mesh position={[0, 92, 0]}>
         <sphereGeometry args={[2.4, 16, 16]} />
-        <meshBasicMaterial color="#b9f7ff" toneMapped={false} />
+        <meshBasicMaterial
+          ref={sphereMat}
+          color="#b9f7ff"
+          transparent
+          opacity={1}
+          toneMapped={false}
+        />
       </mesh>
 
       <mesh ref={ring} position={[0, 14, 0]} rotation={[Math.PI / 2, 0, 0]}>
@@ -331,7 +401,7 @@ function makeGroundTexture() {
   // Central plaza
   const cx = to(0);
   const cy = to(0);
-  const plazaRadius = 30 * scale;
+  const plazaRadius = 22 * scale;
 
   const grad = b.createRadialGradient(cx, cy, 4, cx, cy, plazaRadius);
   grad.addColorStop(0, 'rgba(0, 229, 255, 0.22)');
